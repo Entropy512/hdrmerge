@@ -263,11 +263,11 @@ void DngFloatWriter::createRawIFD() {
     uint16_t cblack[cfaRows * cfaCols];
     for (int row = 0; row < cfaRows; ++row) {
         for (int col = 0; col < cfaCols; ++col) {
-            cblack[row*cfaCols + col] = params->blackAt(col, row);
+            cblack[row*cfaCols + col] = 0;
         }
     }
     rawIFD.addEntry(BLACKLEVEL, IFD::SHORT, cfaRows * cfaCols, cblack);
-    rawIFD.addEntry(WHITELEVEL, IFD::SHORT, params->max);
+    rawIFD.addEntry(WHITELEVEL, IFD::SHORT, 65504); //Largest possible non-inf float16 value
     rawIFD.addEntry(SAMPLESPERPIXEL, IFD::SHORT, 1);
     rawIFD.addEntry(BITSPERSAMPLE, IFD::SHORT, bps);
     if (bps == 24) {

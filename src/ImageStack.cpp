@@ -458,13 +458,13 @@ Array2D<float> ImageStack::compose(const RawParameters & params, int featherRadi
     }
 
     dst.displace(params.leftMargin, params.topMargin);
-    // Scale to params.max and recover the black levels
-    float mult = (params.max - params.maxBlack) / max;
+    // Scale to float16 limit
+    float mult = 65504.0 / max; //65504 is the largest non-inf float16
     #pragma omp parallel for
     for (size_t y = 0; y < params.rawHeight; ++y) {
         for (size_t x = 0; x < params.rawWidth; ++x) {
             dst(x, y) *= mult;
-            dst(x, y) += params.blackAt(x - params.leftMargin, y - params.topMargin);
+            //dst(x, y) += params.blackAt(x - params.leftMargin, y - params.topMargin);
         }
     }
 
