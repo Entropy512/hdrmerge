@@ -104,7 +104,7 @@ private:
     QString filename;
 
     std::unique_ptr<Array2D<uint16_t>[]> scaled;
-    uint16_t satThreshold, max;
+    uint16_t satThreshold, max, min;
     double brightness;
     ResponseFunction response;
     double halfLightPercent;

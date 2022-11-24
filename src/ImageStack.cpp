@@ -21,6 +21,7 @@
  */
 
 #include <algorithm>
+#include <cmath>
 
 #include "BoxBlur.hpp"
 #include "ImageStack.hpp"
@@ -166,8 +167,8 @@ void ImageStack::crop() {
 
 void ImageStack::computeResponseFunctions() {
     Timer t("Compute response functions");
-    for (int i = images.size() - 2; i >= 0; --i) {
-        images[i].computeResponseFunction(images[i + 1]);
+    for (int i = 1; i < images.size(); ++i) {
+        images[i].computeResponseFunction(images[i - 1]);
     }
 }
 
@@ -394,7 +395,7 @@ static Array2D<uint8_t> fattenMask(const Array2D<uint8_t> & mask, int radius) {
 }
 #endif
 
-Array2D<float> ImageStack::compose(const RawParameters & params, int featherRadius) const {
+Array2D<float> ImageStack::compose(const RawParameters & params, int featherRadius, int bit_depth) const {
     int imageMax = images.size() - 1;
     BoxBlur map(fattenMask(mask, featherRadius));
     measureTime("Blur", [&] () {

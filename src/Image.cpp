@@ -44,16 +44,19 @@ void Image::buildImage(uint16_t * rawImage, const RawParameters & params) {
     size_t size = width*height;
     brightness = 0.0;
     max = 0;
+    min = params.black * 100; // some inital big value
     for (size_t y = 0, ry = params.topMargin; y < height; ++y, ++ry) {
         for (size_t x = 0, rx = params.leftMargin; x < width; ++x, ++rx) {
             uint16_t v = rawImage[ry*params.rawWidth + rx];
             (*this)(x, y) = v;
             brightness += v;
             if (v > max) max = v;
+            if (v < min) min = v;
         }
     }
     brightness /= size;
-    response.setLinear(params.max == 0 ? 1.0 : 65535.0 / params.max);
+    // response.setLinear(params.max == 0 ? 1.0 : 65535.0 / params.max);
+    response.setLinear(1.0);
     subtractBlack(params);
 }
 
@@ -165,9 +168,11 @@ void Image::computeResponseFunction(const Image & r) {
                 int pos = y * width + x;
                 double v = usePixels[pos];
                 double nv = rUsePixels[pos];
-                if (v >= nv && v < satThreshold) {
-                    numerator += v * r.response(nv);
-                    denom += v * v;
+                if (v <= nv && nv < satThreshold) {
+                    if ((nv - (double)r.min) / ((double)r.max - (double)r.min) > 0.1) {
+                        numerator += v * r.response(nv);
+                        denom += v * v;
+                    }
                 }
             }
         }
